@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  grpc-stream-client:
+    container_name: grpc-stream-client
+    restart: always
+    build:
+      context: ./grpc_client_stream
+      dockerfile: Dockerfile
+    environment:
+    - SERVER_HOST=grpc-stream-server:50051
+  grpc-stream-server:
+    container_name: grpc-stream-server
+    restart: always
+    build:
+      context: ./grpc_server_stream
+      dockerfile: Dockerfile
+    environment:
+    - SERVER_PORT=:50051      
