@@ -25,7 +25,7 @@ func (*server) GetPrimeNumbers(req *primepb.PrimeNumberRequest, stream primepb.P
 			number = number / divisor
 		} else {
 			divisor++
-			fmt.Printf("Divisor has increased to %v", divisor)
+			fmt.Printf("Divisor has increased to %v\n", divisor)
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/maei/golang_grpc_server_streaming_avg/grpc_client/src/clients"
+	"github.com/maei/golang_grpc_server_streaming_avg/grpc_client/src/domain/dto/primejson"
 	"github.com/maei/golang_grpc_server_streaming_avg/grpc_client/src/domain/dto/primepb"
 	"github.com/maei/shared_utils_go/logger"
 	"io"
@@ -12,12 +13,12 @@ import (
 var PrimeService primeServiceInterface = &primeService{}
 
 type primeServiceInterface interface {
-	GetPrimeNumber()
+	GetPrimeNumber(primeNumber *primepb.PrimeNumber) *primejson.HTTPPrimeResponse
 }
 
 type primeService struct{}
 
-func (*primeService) GetPrimeNumber() {
+func (*primeService) GetPrimeNumber(primeNumber *primepb.PrimeNumber) *primejson.HTTPPrimeResponse {
 	conn, clientErr := clients.GRPCClient.SetClient()
 	if clientErr != nil {
 		logger.Error("error creating grpc client", clientErr)
@@ -26,9 +27,10 @@ func (*primeService) GetPrimeNumber() {
 
 	req := &primepb.PrimeNumberRequest{
 		PrimeNumber: &primepb.PrimeNumber{
-			PrimeNumber: 1000,
+			PrimeNumber: primeNumber.GetPrimeNumber(),
 		},
 	}
+	res := &primejson.HTTPPrimeResponse{}
 
 	resStream, errStream := client.GetPrimeNumbers(context.Background(), req)
 	if errStream != nil {
@@ -42,6 +44,9 @@ func (*primeService) GetPrimeNumber() {
 		if err != nil {
 			logger.Error("error wil fetching messages from stream", err)
 		}
+		res.PrimeResponse = append(res.PrimeResponse, msg.Result)
+
 		fmt.Printf("Response from stream %v\n", msg)
 	}
+	return res
 }
